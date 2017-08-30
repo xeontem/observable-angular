@@ -1,0 +1,20 @@
+.child-child {
+	display: flex;
+	flex-direction: column;
+	position: relative;
+	padding: 40px;
+	min-height: 300px;
+	border: 2px solid green;
+	transition: background 1s;
+}
+
+.changed {
+	background: orange;
+}
+
+h3 {
+  position: absolute;
+  top: 0;
+  right: 43%;
+  left: 43%;
+}

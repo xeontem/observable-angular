@@ -1,0 +1,26 @@
+<div [className]="nextClass + ' main'">
+	<h3>PARENT</h3>
+	<app-child-left1></app-child-left1>
+	<app-child-right1></app-child-right1>
+	<button class="bottom-button" #btn3>make some changes</button>
+</div>
+<div class="events-container" #evntCont>
+	
+	<div [id]="i" [className]="event.visible + ' ' + event.type + ' event-container'" *ngFor="let event of events; let i = index">
+		<span>{{event.type[0] | uppercase }}</span>
+	</div>
+	<div class="test-container">
+		<p>{{timer}}</p>
+		<p>{{result}}</p>
+	</div>
+	<div class="button-container">
+		<button (click)="sortByType()">sort by type</button>
+		<button (click)="reverse()">reverse</button>
+		<button (click)="shake()">shake</button>
+		<button #btn1>calculate</button>
+		<button #btn2>start/reset timer</button>
+		<button (click)="changeProperty()">change test value</button>
+	</div>	
+</div>
+<event-content [event]="selectedEvent"></event-content>
+<y-combinator></y-combinator>

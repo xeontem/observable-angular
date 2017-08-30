@@ -1,0 +1,92 @@
+.main {
+  margin: 10px auto;
+  padding: 40px;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  max-width: 50%;
+  min-height: 400px;
+  border: 2px solid red;
+  transition: background 1s;
+}
+
+.changed {
+	background: orange;
+}
+
+h3 {
+  position: absolute;
+  top: 0;
+  right: 43%;
+  left: 43%;
+}
+
+.bottom-button {
+	position: absolute;
+	bottom: 0;
+	left: 43%;
+	right: 43%; 
+}
+
+.events-container {
+  margin: 10px auto;
+  padding: 40px;
+  position: relative;
+  max-width: 40%;
+  min-height: 400px;
+  border: 2px solid red;
+  transition: background 1s;
+}
+
+.event-container {
+  display: inline-block;
+  margin: 5px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 1s;
+}
+
+.visible {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.event-container span {
+  font-size: 30pt;
+  cursor: pointer;
+}
+
+.event {
+  background: green;
+}
+
+.webinar {
+  background: yellow;
+}
+
+.deadline {
+  background: red;
+}
+
+.workshop {
+  background: purple;
+}
+
+.lecture {
+  background: orange;
+}
+
+.button-container {
+  position: absolute;
+  display: flex;
+  bottom: 0;
+	left: 43%;
+	right: 43%;
+}
+
+.test-container {
+
+}

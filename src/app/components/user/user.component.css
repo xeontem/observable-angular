@@ -1,0 +1,17 @@
+.green-frame {
+	margin: 20px;
+	padding: 20px;
+	border: 2px solid green;
+}
+
+.blue-frame {
+	margin: 20px;
+	padding: 20px;
+	border: 2px solid blue;
+}
+
+.input-container {
+	display: flex;
+  justify-content: space-between;
+  width: 300px;
+}

@@ -1,0 +1,27 @@
+.event-content {
+    position: fixed;
+    top: 40%;
+    right: 20px;
+    padding: 20px;
+    max-width: 300px;
+}
+
+.event {
+  border: 2px solid green;
+}
+
+.webinar {
+  border: 2px solid yellow;
+}
+
+.deadline {
+  border: 2px solid red;
+}
+
+.workshop {
+  border: 2px solid purple;
+}
+
+.lecture {
+  border: 2px solid orange;
+}

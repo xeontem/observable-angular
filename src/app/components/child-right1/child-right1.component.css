@@ -1,0 +1,28 @@
+.child-1-level {
+	display: flex;
+	justify-content: space-between;
+	position: relative;
+	padding: 40px;
+	min-width: 200px;
+	min-height: 400px;
+	border: 2px solid blue;
+	transition: background 1s;
+}
+
+.changed {
+	background: orange;
+}
+
+h3 {
+  position: absolute;
+  top: 0;
+  right: 43%;
+  left: 43%;
+}
+
+button {
+	position: absolute;
+	bottom: 0;
+	left: 43%;
+	right: 43%;
+}
