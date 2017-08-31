@@ -17,6 +17,7 @@ export class YComponent implements OnInit {
   ngOnInit() {
     // identity:: a -> a
     const identity = x => x; // return arg
+    // application - B-reduction
     const apply = f => x => f(x);// apply f -> x
     const constant = x => y => x;// skip y
     const compose = f => g => x => f(g(x));// apply g -> x && f -> g
@@ -27,7 +28,34 @@ export class YComponent implements OnInit {
     const Y = f => f(x => Y(f)(x));// find fixed point of f; Y = f => f(Y(f));
     // Z - combinator
     const Z = null;// ???
-    // application - B-reduction
+    // if
+    const cond = x => t => f => x ? t : f;
+
+  }
+  
+  moveY(e) {
+    console.log('mouse down');
+    // le
+    e.preventDefault();
+    e.path.map(el => {
+      if(el.classList && el.classList.contains('y-combinator')) {
+        console.log(`mouse: ${e.clientX}, ${e.clientY}`);
+        el.style.left = `${e.clientX}px`;
+        el.style.bottom = `${e.clientY-20}px`;
+        let body = [document.body.clientWidth, document.body.clientHeight];
+        console.log(body);
+        
+        
+        // el.style.bottom = 
+      }
+    })
+    
+  }
+
+  stopMoveY(e) {
+    // console.log(e);
+    
+    // e.target.onmousedown = null;
   }
 
   withYcombinator() {

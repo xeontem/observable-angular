@@ -1,8 +1,18 @@
 .y-combinator {
-    position: fixed;
-    top: 30%;
+    position: absolute;
+    bottom: 20px;
     left: 20px;
     padding: 20px;
     max-width: 300px;
     border: 2px solid forestgreen;
+}
+
+.shifting-hat {
+    width: 100%;
+    height: 28px;
+    background: forestgreen;
+    margin: -20px 0px 10px -20px;
+    cursor: move;
+    text-align: center;
+    padding: 10px 20px;
 }
