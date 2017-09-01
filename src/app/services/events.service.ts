@@ -5,7 +5,7 @@ import { Http } from '@angular/http';
 export class EventsService {
 
   constructor(public http:Http) {
-    console.log('events service connected');
+    // console.log('events service connected');
    }
 
   getEvents() {

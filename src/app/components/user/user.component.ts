@@ -40,7 +40,7 @@ export class UserComponent implements OnInit {
   }
 
   addHobby(hobby) {
-  	console.log(hobby);
+  	// console.log(hobby);
   	this.hobbies.unshift(hobby);
   	return false;
   }

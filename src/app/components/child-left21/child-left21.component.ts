@@ -44,10 +44,10 @@ export class ChildLeft21Component implements OnInit {
   }
   
   ngOnChanges() {
-  	console.log('onChanges');
+  	// console.log('onChanges');
   }
 
   ngDoCheck() {
-  	console.log('doCheck in left left');
+  	// console.log('doCheck in left left');
   }
 }

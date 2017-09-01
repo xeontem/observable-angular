@@ -32,7 +32,7 @@ export class ChildRight1Component implements OnInit {
   		setTimeout(()=>{this.changed = ''}, 1000);
   		this.allow = false;
     }
-  	  console.log('doCheck in right');
+  	  // console.log('doCheck in right');
   }
 
 }

@@ -1,10 +1,11 @@
 .y-combinator {
     position: absolute;
-    bottom: 20px;
-    left: 20px;
+    /* top: 200px; */
+    /* left: 20px; */
     padding: 20px;
     max-width: 300px;
     border: 2px solid forestgreen;
+    background: white;
 }
 
 .shifting-hat {
@@ -16,3 +17,4 @@
     text-align: center;
     padding: 10px 20px;
 }
+

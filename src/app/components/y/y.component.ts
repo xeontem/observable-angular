@@ -1,4 +1,5 @@
 import { ViewChild, Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'y-combinator',
@@ -7,12 +8,25 @@ import { ViewChild, Component, OnInit, OnDestroy, ChangeDetectionStrategy, Chang
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class YComponent implements OnInit {
+  @ViewChild('comb') comb: ElementRef;
+
   perfWith:number;
   perfWithout:number;
   withValue:number;
   withoutValue:number;
-  
-  constructor(private cd: ChangeDetectorRef) { }
+  dragstartStream$: Subscription;
+  dragenterStream$: Subscription;
+  dragoverStream$: Subscription;
+  dragleaveStream$: Subscription;
+  dropStream$: Subscription;
+  dragendStream$: Subscription;
+  clickStream$: Subscription;
+  bodyoverStream$: Subscription;
+  initLayerX: number;
+  initLayerY: number;
+  cookies: {top?:string, left?:string} = {};
+
+  constructor(private cd: ChangeDetectorRef, private elements: ElementRef) { }
 
   ngOnInit() {
     // identity:: a -> a
@@ -30,32 +44,85 @@ export class YComponent implements OnInit {
     const Z = null;// ???
     // if
     const cond = x => t => f => x ? t : f;
+    // ------------------------------ define element ------------------------------
+    const el = this.comb.nativeElement;
 
+    //--------------------------------- check cookies for coords ---------------------
+    document.cookie.split('; ').map(cookie => {
+      let eq = cookie.indexOf('=');
+      let key = cookie.slice(0, eq);
+      let value = cookie.slice(eq+1);
+      this.cookies[key] = value;
+    })
+
+    //-------------------------------- set position --------------------------
+    el.style.top = `${document.documentElement.offsetHeight - 400}px`;// default
+    el.style.left = `${20}px`;// default
+    if(this.cookies.top) el.style.top = this.cookies.top;
+    if(this.cookies.left) el.style.left = this.cookies.left;
+
+    //------------------------------- handle drag -----------------------------------
+    this.dragstartStream$ = Observable.fromEvent(el, 'dragstart')
+      .subscribe(e => this.handleDragStart(e, el));
+    this.dragenterStream$ = Observable.fromEvent(el, 'dragenter')
+      .subscribe(e => this.handleDragEnter(e, el));
+    this.dragoverStream$ = Observable.fromEvent(el, 'dragover')
+      .subscribe(e => this.handleDragOver(e, el));
+    this.dragleaveStream$ = Observable.fromEvent(el, 'dragleave')
+      .subscribe(e => this.handleDragLeave(e, el));
+    this.dragendStream$ = Observable.fromEvent(el, 'dragend')
+      .subscribe(e => this.handleDragEnd(e, el));
+    this.dropStream$ = Observable.fromEvent(el, 'drop')
+      .subscribe(e => this.handleDrop(e, el), err => console.dir(err));
+
+    this.bodyoverStream$ = Observable.fromEvent(document.body, 'dragover')
+      .subscribe(e => this.handledragoverBody(e))
   }
   
-  moveY(e) {
-    console.log('mouse down');
-    // le
-    e.preventDefault();
-    e.path.map(el => {
-      if(el.classList && el.classList.contains('y-combinator')) {
-        console.log(`mouse: ${e.clientX}, ${e.clientY}`);
-        el.style.left = `${e.clientX}px`;
-        el.style.bottom = `${e.clientY-20}px`;
-        let body = [document.body.clientWidth, document.body.clientHeight];
-        console.log(body);
-        
-        
-        // el.style.bottom = 
-      }
-    })
-    
+  handledragoverBody(e) {
+    // e.dataTransfer.dropEffect = 'move';
   }
 
-  stopMoveY(e) {
-    // console.log(e);
+  handleDragStart(e, el) {
     
-    // e.target.onmousedown = null;
+    this.initLayerX = e.layerX;
+    this.initLayerY = e.layerY; 
+    el.style.opacity = '0.4';
+  }
+
+  handleDragEnter(e, el) {
+    el.classList.add('drag-over');
+  }
+
+  handleDragOver(e, el) {
+    if (e.preventDefault) {
+      e.preventDefault(); // Necessary. Allows us to drop.
+    }
+    e.dataTransfer.dropEffect = 'move';  // See the section on the DataTransfer object.
+    return false;
+  } 
+  
+  handleDragLeave(e, el) {
+    el.classList.remove('drag-over');  // this / e.target is previous target element.
+  }
+  
+  handleDrop(e, el) {
+    if (e.stopPropagation) {
+      e.stopPropagation(); // stops the browser from redirecting.
+    }
+    return false;
+  }
+  
+  handleDragEnd(e, el) {
+    //------------------------ apply pos to elem ---------------------------
+    el.style.opacity = '1';
+    el.style.top = `${e.pageY - this.initLayerY - 20}px`;// 20 - padding
+    el.style.left = `${e.pageX - this.initLayerX - 10}px`;// 10 - padding
+    el.classList.remove('drag-over');
+    //------------------------ store pos into cookies ----------------------
+    let expire = new Date(new Date().getTime() + 60 * 1000).toUTCString();// set expire date
+    document.cookie = `top=${el.style.top}; path=/; expires=${expire}`;
+    document.cookie = `left=${el.style.left}; path=/; expires=${expire}`;
   }
 
   withYcombinator() {

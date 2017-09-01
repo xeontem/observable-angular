@@ -7,7 +7,7 @@ import 'rxjs/add/operator/map';
 export class DataService {
 
   constructor(public http:Http) {
-  	console.log('data service connected');
+  	// console.log('data service connected');
    }
 
   getPosts() {

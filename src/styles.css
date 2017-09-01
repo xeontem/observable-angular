@@ -2,3 +2,7 @@
 body {
     position: relative;
 }
+
+.drag-over {
+    background: red;
+}

@@ -30,6 +30,6 @@ export class ChildLeft1Component implements OnInit {
   		setTimeout(()=>{this.changed = ''}, 1000);
   		this.allow = false;
   	}
-  		console.log('doCheck in left');
+  		// console.log('doCheck in left');
   }
 }

@@ -28,7 +28,7 @@ export class ChildRight22Component implements OnInit {
   		setTimeout(()=>{this.changed = ''}, 1000);
   		this.allow = false;
     }
-  	  console.log('doCheck in right right');
+  	  // console.log('doCheck in right right');
   }
 
 }
