@@ -146,12 +146,21 @@ export class YComponent implements OnInit {
     // const Y = F => F(Y(F)); - not working due to recursion;
     // const Y = F => F(x => Y(F)(x)); - done. no more recursion;
     // const fib = Y(fibF);
+    // let someF:: perf -> f -> a -> newPref 
+    // let someF = perf => f => a => {
+    //   f(a);
+    //   return performance.now()-perf;
+    // }
+
     let value:number;
+    
+    //perf:: f -> a -> number
     const perf = f => x => {
       const start = performance.now();
       value = f(x);
       return performance.now() - start;
     };
+    
     // memoize
     const Ymem = memory => F => {
       return F(x => {
