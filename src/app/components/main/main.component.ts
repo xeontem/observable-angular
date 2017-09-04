@@ -4,6 +4,10 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { interval as observableInterval } from 'rxjs/observable/interval';
 import { Observable, Subscription } from 'rxjs';
 // let Observable.bubbleSort: any;
+const cond = x => t => f => x ? t : f;
+const condL = x => tF => fF => x ? tF() : fF();
+const swap = arr => i => j => [arr[i], arr[j]] = [arr[j], arr[i]];
+const defineType = arr => i => cond(arr[i])(arr[i].type)({});
 
 interface SelectedEvent {
   type: string,
@@ -51,7 +55,6 @@ export class MainComponent implements OnInit, OnDestroy  {
   intervalStream$ = observableInterval(1000)
     .map(val => `page loaded a ${val} seconds ago`); 
 
-  // selectEventStream$ = new BehaviorSubject({type: 'select event'});
   calculateStream$ = new BehaviorSubject([0, 0]);
   changeClassStream$ = new BehaviorSubject('');
   sortStream$ = new BehaviorSubject(0);
@@ -74,45 +77,73 @@ export class MainComponent implements OnInit, OnDestroy  {
   changeProperty() {
     this.testObj.value = 'I changed this value just now';
   }
-  makeSort(prop, type, i) {
-    this.events.map((ev, j) => {
-      if(j > i && ev[prop] == type && this.events[i][prop] != type) {
-          let temp = JSON.parse(JSON.stringify(this.events[i]));
-        this.events[i] = ev;
-        this.events[j] = temp;
-        this.cd.markForCheck();
-        return;
-      }
-    });
+
+  tryFP() {
+    // fixed points:
+    // cond = 0 => 1 => 0 => 0
+    // cond = 1 => 0 => 1 => 0
+    // ----------------------------------------
+    // Y(t) = fixed
+    // cond(t) = t; // if t == true
+    // cond(t) = f // if t == false
+    // Y(cond) = t || f;
+    // Y = F => F(Y(F));
+    // Ycond = F => F(x => Ycond(F)(x));
+    // const temp = Ycond(cond);
+    // temp(true)
+     const addFive = n => n+5;
+     const addSix = n => n+6;
+     const cond = x => t => f => {
+      console.log(x); 
+      return x ? t : f};
+     const Ycond = F => F(x => Ycond(F)(x));
+     const fls = Ycond(Ycond(cond));
+     console.log(fls);
+     
+    //  const condAfter = x => t => f => x ? condC(t) : condC(f);
+     const condC = Ycond(cond);
+    //  const result = condAfter(1);
+    //  const check = condF(5)(addFive)(addSix);// it works
+    //  console.log(condC(3)(4));
   }
 
-  sort() {
-    // this.sortStream$
-    Observable.interval(5).take(this.events.length)
-      .map(i => this.sortStream$.next(i))
-      
+  secondTry() {
+    const sFunc = x => f => {
+      const res = f(x);
+      return y => y(res);
+    }
+    const trsx = sFunc(3)(x => x+x)(x => x*x);
+    const Ycond = F => F(x => Ycond(F)(x));
+    const sum = Ycond(sFunc);
+    const str = sum(x => x+x)(x => x+x);
+    console.log(str)
   }
-
+  
   sortByType() {
     this.sortByTypeStream$ = Observable.interval(5).take(this.events.length)
-      .subscribe(i => this.types.map(val => this.makeSort('type', val, i)));
+      .flatMap(i => Observable.from(this.events))
+      .map((ev, j) => cond(j >= this.events.length)(j = j % this.events.length)(j))
+      .map(j => condL(j < this.events.length-1)
+        ((x => cond(defineType(this.events)(j) > defineType(this.events)(j+1))
+          ({bool: true, j})
+          ({bool: false, j})))
+        ((x => ({bool: false, j}))))
+      .map(o => condL(o.bool)(x => swap(this.events)(o.j)(o.j+1))(x => []))
+      .subscribe(i => this.cd.markForCheck());
   }
 
   reverse() {
-    return new Promise((res, rej) => {
-      this.reverseStream$ = observableInterval(5)
-        .take(this.events.length/2)
-        .map(i => [i, this.events.length-i-1 < 0 ? 0 : this.events.length-i-1])
-        .map(i => [this.events[i[0]], this.events[i[1]]] = [this.events[i[1]], this.events[i[0]]])
-        .subscribe(() => this.cd.markForCheck());
-      res(this.events);
-      });
+    this.reverseStream$ = observableInterval(5)
+      .take(this.events.length/2)
+      .map(i => ({i, j: cond(this.events.length-i-1 < 0)(0)(this.events.length-i-1)}))
+      .map(o => swap(this.events)(o.i)(o.j))
+      .subscribe(i => this.cd.markForCheck());
   }
 
   shake() {
     this.shakeStream$ = observableInterval(5).take(this.events.length/2)
-    .map(i => [~~(Math.random() * this.events.length), ~~(Math.random() * this.events.length)])
-    .do(a => [this.events[a[0]], this.events[a[1]]] = [this.events[a[1]], this.events[a[0]]])
+    .map(i => ({i: ~~(Math.random() * this.events.length), j: ~~(Math.random() * this.events.length)}))
+    .do(o => swap(this.events)(o.i)(o.j))
     .subscribe(a => this.cd.markForCheck())
   }
 
@@ -124,22 +155,18 @@ export class MainComponent implements OnInit, OnDestroy  {
       .filter((el: any) => el.classList)
       .filter((el: any) => el.classList.contains('event-container'))
       .pluck('id')
-      .subscribe((id: number) => {
-        this.selectedEvent = this.events[id];
-        this.cd.markForCheck();
-    });  
+      .do((id:number) => this.selectedEvent = this.events[id])
+      .subscribe(id => this.cd.markForCheck());
+
     this.button1ClickStream$ = Observable.fromEvent(this.button1.nativeElement, 'click')
-      .subscribe(e => {
-        this.calculateStream$.next([3, 4]);
-        this.cd.markForCheck();
-    });
+      .do(i => this.calculateStream$.next([3, 4]))
+      .subscribe(e => this.cd.markForCheck());
+
     this.button2ClickStream$ = Observable.fromEvent(this.button2.nativeElement, 'click')
-    .switchMap(event => {
-      return this.intervalStream$})
-      .subscribe(val => {
-        this.timer = val;
-        this.cd.markForCheck();
-    });
+      .switchMap(event => this.intervalStream$)
+      .do(val => this.timer = val)
+      .subscribe(val => this.cd.markForCheck());
+
     this.button3ClickStream$ = Observable.fromEvent(this.button3.nativeElement, 'click')
       .subscribe(e => {
         this.changeClassStream$.next('changed');
@@ -152,24 +179,14 @@ export class MainComponent implements OnInit, OnDestroy  {
     });
     
     this.eventsService.getEvents()
-    .map(events => {
-      this.events = events;
-      return events})
-    .switchMap(events => Observable.from(events))
-    .map((event, index) => {
-      this.tempArr.push(index);
-      return event})
-    .reduce((acc: Array<any>, event) => {
-      acc.push(event);
-      return acc}, [])
-    .switchMap((events:Array<any>) => observableInterval(5).take(events.length))
-    .subscribe(index => {
-      let randomTempArrInd = parseInt((Math.random() * this.tempArr.length).toString());
-      let randEventInd = this.tempArr[randomTempArrInd];
-      this.events[randEventInd].visible = 'visible';
-      this.tempArr.splice(randomTempArrInd, 1);
-      this.cd.markForCheck();
-    });
+      .map(events => this.events = events)
+      .switchMap(events => Observable.from(events))
+      .map((event, index) => this.tempArr.push(index))
+      .switchMap(i => observableInterval(5).take(this.events.length))
+      .map(i => ~~(Math.random() * this.tempArr.length))
+      .do(r => this.events[this.tempArr[r]].visible = 'visible')
+      .map(r => this.tempArr.splice(r, 1))
+      .subscribe(i => this.cd.markForCheck())
 
     this.calculateStream$.subscribe(numArr => {
       this.result = this.lazyEvaluate(numArr[0], numArr[1]);
