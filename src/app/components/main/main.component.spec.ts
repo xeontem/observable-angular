@@ -45,14 +45,11 @@ describe('MainComponent', () => {
   });
   it('should store events resieved from servise', () => {
     component.ngOnInit();
-    component.reverse().then(e => {
+    component.reverse();
       console.log(component.events);
       console.log(component.events[0]);
-      console.log(component.events[1]);
-      console.log(component.events[2]);
       console.log(component.events);
       expect(component.events[0].type).toEqual('workshop');
-    });
     // fixture.detectChanges();
   });
 });
