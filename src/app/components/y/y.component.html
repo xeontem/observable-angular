@@ -6,7 +6,7 @@
   <p>value without:{{withoutValue}}</p>
   <button (click)="withoutYcombinator()">without</button>
   <hr>
-  <p>perfomanse with:{{perfWith}}</p>
-  <p>value with:{{withValue}}</p>
+  <p>perfomanse with:{{perfWith$ | async}}</p>
+  <p>value with:{{withValue$ | async}}</p>
   <button (click)="withYcombinator()">with</button>
 </div>

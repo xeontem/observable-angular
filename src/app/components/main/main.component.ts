@@ -3,22 +3,16 @@ import { EventsService } from '../../services/events.service';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { interval as observableInterval } from 'rxjs/observable/interval';
 import { Observable, Subscription } from 'rxjs';
-// let Observable.bubbleSort: any;
+import { Store } from '@ngrx/store';
+import { CHANGE_OBJ_VAL, SELECT_EVENT, SelectedEvent } from '../../redux/reducers/main.component.reducer';
+import { AppState } from '../../redux/state';
+import { get_value, get_selectedEvent } from '../../redux/selector';
 const cond = x => t => f => x ? t : f;
 const condL = x => tF => fF => x ? tF() : fF();
 const swap = arr => i => j => [arr[i], arr[j]] = [arr[j], arr[i]];
 const defineType = arr => i => cond(arr[i])(arr[i].type)({});
 
-interface SelectedEvent {
-  type: string,
-  title?: string,
-  description?: string,
-  duration?: number,
-  id?: string,
-  location?: string,
-  resources?: Array<any>,
-  speakers?: Array<any>,
-};
+
 @Component({
   selector: 'app-main',
   templateUrl: './main.component.html',
@@ -31,7 +25,7 @@ export class MainComponent implements OnInit, OnDestroy  {
   @ViewChild('btn3') button3: ElementRef;
   @ViewChild('evntCont') container: ElementRef;
 
-  selectedEvent: SelectedEvent = {type: 'select event'};
+  
   types: Array<string> = ['workshop', 'webinar', 'lecture', 'deadline', 'event'];
   result: number = 0;
   events: Array<any> = [];
@@ -49,9 +43,9 @@ export class MainComponent implements OnInit, OnDestroy  {
   setVisibleStream$: Subscription;
   // sortStream$: Subscription;
   parsePathStream$: Subscription;
-  testObj: {value: string};
+  value$: Observable<string>;//{ value: string };
+  selectedEvent$: Observable<SelectedEvent>;
   switch: boolean = false;
-
   intervalStream$ = observableInterval(1000)
     .map(val => `page loaded a ${val} seconds ago`); 
 
@@ -62,11 +56,8 @@ export class MainComponent implements OnInit, OnDestroy  {
   constructor(
     private eventsService: EventsService,
     private cd: ChangeDetectorRef,
-    private elements: ElementRef) {
-      this.testObj = {
-        value: 'test value'
-      }
-    }
+    private elements: ElementRef,
+    private store: Store<AppState>) { }
 
   private lazyEvaluate(x:number, y:number):number {
     let caclcSum = (a:number, b:number):number => a+b;
@@ -75,7 +66,8 @@ export class MainComponent implements OnInit, OnDestroy  {
   }
 
   changeProperty() {
-    this.testObj.value = 'I changed this value just now';
+    this.store.dispatch({ type: CHANGE_OBJ_VAL });
+    // this.testObj.value = 'I changed this value just now';
   }
 
   tryFP() {
@@ -149,14 +141,16 @@ export class MainComponent implements OnInit, OnDestroy  {
 
   ngOnInit() {
 
+    this.value$ = this.store.select(get_value);
+    this.selectedEvent$ = this.store.select(get_selectedEvent);
+
     this.containerClickStream$ = Observable.fromEvent(this.container.nativeElement, 'click')
       .pluck('path')
       .flatMap((path: any) => Observable.from(path))
       .filter((el: any) => el.classList)
       .filter((el: any) => el.classList.contains('event-container'))
       .pluck('id')
-      .do((id:number) => this.selectedEvent = this.events[id])
-      .subscribe(id => this.cd.markForCheck());
+      .subscribe((id:number) => this.store.dispatch({ type: SELECT_EVENT, payload: this.events[id] }));
 
     this.button1ClickStream$ = Observable.fromEvent(this.button1.nativeElement, 'click')
       .do(i => this.calculateStream$.next([3, 4]))

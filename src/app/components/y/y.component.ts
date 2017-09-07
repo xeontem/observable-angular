@@ -1,5 +1,10 @@
 import { ViewChild, Component, OnInit, OnDestroy, ChangeDetectionStrategy, ChangeDetectorRef, ElementRef } from '@angular/core';
 import { Observable, Subscription } from 'rxjs';
+import { Store } from '@ngrx/store';
+
+import { AppState } from '../../redux/state';
+import { STORE_PREFWITH } from '../../redux/reducers/y.component.reducer';
+import { get_perfWith, get_withValue } from '../../redux/selector';
 
 @Component({
   selector: 'y-combinator',
@@ -10,9 +15,9 @@ import { Observable, Subscription } from 'rxjs';
 export class YComponent implements OnInit {
   @ViewChild('comb') comb: ElementRef;
 
-  perfWith:number;
+  perfWith$:Observable<number>;
+  withValue$:Observable<number>;
   perfWithout:number;
-  withValue:number;
   withoutValue:number;
   dragstartStream$: Subscription;
   dragenterStream$: Subscription;
@@ -26,9 +31,16 @@ export class YComponent implements OnInit {
   initLayerY: number;
   cookies: {top?:string, left?:string} = {};
 
-  constructor(private cd: ChangeDetectorRef, private elements: ElementRef) { }
+  constructor(
+    private cd: ChangeDetectorRef,
+    private elements: ElementRef,
+    private store: Store<AppState>) { }
 
   ngOnInit() {
+
+    this.perfWith$ = this.store.select(get_perfWith);
+    this.withValue$ = this.store.select(get_withValue);
+
     // identity:: a -> a
     const identity = x => x; // return arg
     // application - B-reduction
@@ -171,9 +183,12 @@ export class YComponent implements OnInit {
       });
     };
     const fibMem = Ymem(new Map())(fibF);
-    this.perfWith = Number(perf(fibMem)(40).toFixed(5));
-    this.withValue = value;
-    this.cd.markForCheck();
+    this.store.dispatch({ 
+      type: STORE_PREFWITH,
+      payload: {perfWith: Number(perf(fibMem)(40).toFixed(5)), withValue: value }});
+    // this.perfWith = ;
+    // this.withValue = value;
+    // this.cd.markForCheck();
   }
 
   withoutYcombinator() {

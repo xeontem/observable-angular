@@ -23,6 +23,11 @@ import { TranslateService } from './services/translate.service';
 
 import { EventContentPipe } from './components/event-content/event-content.pipe';
 
+//redux
+import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from '@ngrx/store-devtools';
+import { combiner } from './redux/combiner';
+import { simpleReducer } from './redux/reducers/simple.reducer';
 
 const appRoutes:Routes = [
 	{path: '', component: UserComponent},
@@ -49,7 +54,9 @@ const appRoutes:Routes = [
     BrowserModule,
     FormsModule,
     HttpModule,
-    RouterModule.forRoot(appRoutes)
+    RouterModule.forRoot(appRoutes),
+    StoreDevtoolsModule.instrument(),// redux devtools
+    StoreModule.forRoot({combiner})//redux provide reducers (an object is required)
   ],
   providers: [DataService, EventsService, TranslateService],
   bootstrap: [AppComponent]
