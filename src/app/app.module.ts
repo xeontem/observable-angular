@@ -27,7 +27,7 @@ import { EventContentPipe } from './components/event-content/event-content.pipe'
 import { StoreModule } from '@ngrx/store';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { combiner } from './redux/combiner';
-import { simpleReducer } from './redux/reducers/simple.reducer';
+//import { simpleReducer } from './redux/reducers/simple.reducer';
 
 const appRoutes:Routes = [
 	{path: '', component: UserComponent},
